@@ -1,22 +1,22 @@
-% для работы нужен RF Toolbox
+% РґР»СЏ СЂР°Р±РѕС‚С‹ РЅСѓР¶РµРЅ RF Toolbox
 clear;
 
-%--------параметры--------
+%--------РїР°СЂР°РјРµС‚СЂС‹--------
 
-% показывать фазы в градусах
+% РїРѕРєР°Р·С‹РІР°С‚СЊ С„Р°Р·С‹ РІ РіСЂР°РґСѓСЃР°С…
 showAnglesInDegrees = true;
 
-% коэффициент пересчета из ГГц в Гц
+% РєРѕСЌС„С„РёС†РёРµРЅС‚ РїРµСЂРµСЃС‡РµС‚Р° РёР· Р“Р“С† РІ Р“С†
 freqCoef = 1E+9;   
 
-% индексы рассмативаемых частот
-freqMin = 1.2; % ГГц
-freqMax = 1.4; % ГГц
+% РёРЅРґРµРєСЃС‹ СЂР°СЃСЃРјР°С‚РёРІР°РµРјС‹С… С‡Р°СЃС‚РѕС‚
+freqMin = 1.2; % Р“Р“С†
+freqMax = 1.4; % Р“Р“С†
 
-% сохранить массивы в таблице
+% СЃРѕС…СЂР°РЅРёС‚СЊ РјР°СЃСЃРёРІС‹ РІ С‚Р°Р±Р»РёС†Рµ
 saveTable = true;
 tableFormat = '.xlsx';
-% порядок сохраения листов в таблице эксель
+% РїРѕСЂСЏРґРѕРє СЃРѕС…СЂР°РµРЅРёСЏ Р»РёСЃС‚РѕРІ РІ С‚Р°Р±Р»РёС†Рµ СЌРєСЃРµР»СЊ
 saveList = {...
     'S21dB',   'S21Ang',...
     'S11dB',   'S11Ang',...
@@ -27,39 +27,39 @@ saveList = {...
 
 %-------------------------
 
-% полный путь к текущей директории
+% РїРѕР»РЅС‹Р№ РїСѓС‚СЊ Рє С‚РµРєСѓС‰РµР№ РґРёСЂРµРєС‚РѕСЂРёРё
 cDir = cd;
 
-% название выходной таблицы
+% РЅР°Р·РІР°РЅРёРµ РІС‹С…РѕРґРЅРѕР№ С‚Р°Р±Р»РёС†С‹
 outputTableName = split(cDir,'\');
 outputTableName = char(outputTableName(end));
 
-% список файлов .s2p
+% СЃРїРёСЃРѕРє С„Р°Р№Р»РѕРІ .s2p
 fileDirs = dir(fullfile('*.s2p'));
 
-% сортировка имен файлов (углов) по возрастанию
+% СЃРѕСЂС‚РёСЂРѕРІРєР° РёРјРµРЅ С„Р°Р№Р»РѕРІ (СѓРіР»РѕРІ) РїРѕ РІРѕР·СЂР°СЃС‚Р°РЅРёСЋ
 fileNames = string({fileDirs.name});
 angleArray = double(strrep(fileNames,'.s2p',''));
 angleArray = sort(angleArray);
 fileNames = string(angleArray) + ".s2p";
 
-% ширина массивов
+% С€РёСЂРёРЅР° РјР°СЃСЃРёРІРѕРІ
 width = size(fileNames);
 width = width(1,2);
 
-% определение сетки частот
+% РѕРїСЂРµРґРµР»РµРЅРёРµ СЃРµС‚РєРё С‡Р°СЃС‚РѕС‚
 S = sparameters(fileNames(1,1));
 nFreqMin = find(S.Frequencies == freqMin * freqCoef);
 nFreqMax = find(S.Frequencies == freqMax * freqCoef);
 freqRange = [nFreqMin : nFreqMax];
 
-% запись сетки частот
+% Р·Р°РїРёСЃСЊ СЃРµС‚РєРё С‡Р°СЃС‚РѕС‚
 freqs = S.Frequencies(freqRange) / freqCoef;
 
-% длина массивов
+% РґР»РёРЅР° РјР°СЃСЃРёРІРѕРІ
 length = size(freqs);
 
-% имена извлекаемых переменных
+% РёРјРµРЅР° РёР·РІР»РµРєР°РµРјС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
 SParameterVarNames = {...
     'S11',      'S12',      'S21',      'S22';...
     'S11dB',    'S12dB',    'S21dB',    'S22dB';...
@@ -67,26 +67,26 @@ SParameterVarNames = {...
     }; 
 
 for i=1:width
-    % S-параметры из .s2p
+    % S-РїР°СЂР°РјРµС‚СЂС‹ РёР· .s2p
     S = sparameters(fileNames(i));
 
     for ik = 1:4
-        % индексы Smn
+        % РёРЅРґРµРєСЃС‹ Smn
         m = mod(ik,2) + floor(ik / 2);        
         n = 1 + (mod(ik,2) == 0);                 
         
-        % имя переменной Smn
+        % РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ Smn
         Smn = SParameterVarNames{1, ik};
-        % присвоение значений соответствующего S-параметра
+        % РїСЂРёСЃРІРѕРµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµРіРѕ S-РїР°СЂР°РјРµС‚СЂР°
         assignin('base', Smn, S.Parameters(m, n, freqRange))
-        % изменение размерности
+        % РёР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРЅРѕСЃС‚Рё
         assignin('base', Smn, reshape(evalin('base', Smn),[length, 1]));
         
-        % имя переменной SmndB
+        % РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ SmndB
         SmndB = SParameterVarNames{2, ik};  
         assignin('base', SmndB, 20 * log10(abs(evalin('base', Smn))));
         
-        % имя переменной SmnAng
+        % РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ SmnAng
         SmnAng = SParameterVarNames{3, ik}; 
         if showAnglesInDegrees
             assignin('base', SmnAng, rad2deg(angle(evalin('base', Smn))));     
@@ -95,32 +95,32 @@ for i=1:width
         end
         
         if i==1
-            % инициализация таблиц
+            % РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†
             assignin('base', [SmndB 'Array'], evalin('base', SmndB));
             assignin('base', [SmnAng 'Array'], evalin('base', SmnAng));        
             
-            % инициализация таблицы КСВ
+            % РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ С‚Р°Р±Р»РёС†С‹ РљРЎР’
             if m == 1 && n == 1 
                 VSWRArray = (1 + 10.^(0.1*S11dB))./(1 - 10.^(0.1*S11dB));
             end
         else
-            % добавление столбца значений 
+            % РґРѕР±Р°РІР»РµРЅРёРµ СЃС‚РѕР»Р±С†Р° Р·РЅР°С‡РµРЅРёР№ 
             assignin('base', [SmndB 'Array'], ...
                 cat(2, evalin('base', [SmndB 'Array']), evalin('base', SmndB)));       
             assignin('base', [SmnAng 'Array'], ...
                 cat(2, evalin('base', [SmnAng 'Array']), evalin('base', SmnAng)));
             
-            % добавление столбца значений КСВ 
+            % РґРѕР±Р°РІР»РµРЅРёРµ СЃС‚РѕР»Р±С†Р° Р·РЅР°С‡РµРЅРёР№ РљРЎР’ 
             if m==1 && n==1
             VSWRArray = cat(2, VSWRArray, (1+10.^(0.1*S11dB))./(1-10.^(0.1*S11dB)));        
             end
         end
-    % удаление лишних массивов (для удобства в рабочем пространстве)
+    % СѓРґР°Р»РµРЅРёРµ Р»РёС€РЅРёС… РјР°СЃСЃРёРІРѕРІ (РґР»СЏ СѓРґРѕР±СЃС‚РІР° РІ СЂР°Р±РѕС‡РµРј РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРµ)
      clear(SParameterVarNames{:});
     end
 end
 
-% расчет нормированной ДН
+% СЂР°СЃС‡РµС‚ РЅРѕСЂРјРёСЂРѕРІР°РЅРЅРѕР№ Р”Рќ
 DNArray = zeros([length(1),width]);
 for row = 1:length
   for col = 1:width
@@ -129,10 +129,10 @@ for row = 1:length
 end
 
 if saveTable
-    % сохранение массивов
+    % СЃРѕС…СЂР°РЅРµРЅРёРµ РјР°СЃСЃРёРІРѕРІ
     for ik = 1:numel(saveList)
 
-        % имя листа таблицы, согласно списку сохранения
+        % РёРјСЏ Р»РёСЃС‚Р° С‚Р°Р±Р»РёС†С‹, СЃРѕРіР»Р°СЃРЅРѕ СЃРїРёСЃРєСѓ СЃРѕС…СЂР°РЅРµРЅРёСЏ
         sheetName = saveList{ik};
 
         writematrix(...
